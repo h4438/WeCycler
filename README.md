@@ -6,7 +6,7 @@ We are aiming at helping others to decide what to do with their used stuff in an
 
 ```
 AI21=ai_key
-LANG=langchain_plus_key
+LANGCHAIN=langchain_plus_key
 ```
 
 
