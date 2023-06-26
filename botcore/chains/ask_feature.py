@@ -12,7 +12,7 @@ from langchain.llms import BaseLLM
 from langchain import LLMChain
 import sys
 import os
-sys.path.apppend(f'{os.path.dirname(__file__)}/..')
+sys.path.apppend(f'{os.path.dirname(__file__)}/../..')
 from botcore.utils.prompt_utils import build_prompt
 
 def build_ask_feature_chain(model: BaseLLM):
@@ -20,5 +20,5 @@ def build_ask_feature_chain(model: BaseLLM):
     outputs = ASK_FEATURE_CONST['outputs']
     template = ASK_FEATURE_CONST['template']
     prompt = build_prompt(inputs, outputs, template, include_parser=False)
-    chain = LLMChain(llm=MODEL, prompt=prompt, output_key='result')
+    chain = LLMChain(llm=model, prompt=prompt, output_key='result')
     return chain
