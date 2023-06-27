@@ -1,7 +1,7 @@
 import sys
 import os
 
-sys.path.append(f'{os.path.dirname(__file__)}/')
+sys.path.append(f'{os.path.dirname(__file__)}/../')
 
 from botcore.setup import trace_ai21
 
