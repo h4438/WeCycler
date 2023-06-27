@@ -8,14 +8,16 @@ We are aiming at helping others to decide what to do with their used stuff in an
 AI21=ai_key
 LANGCHAIN=langchain_plus_key
 ```
-2. Run run_test.py to see how to import botcore/
+2. To import botcore/
 
 ```python
+# ./tests/test_ai21.py
+
 import sys
 import os
 
 # should point to the parent folder of botcore
-sys.path.append(f'{os.path.dirname(__file__)}/')
+sys.path.append(f'{os.path.dirname(__file__)}/../')
 
 from botcore.setup import trace_ai21
 
