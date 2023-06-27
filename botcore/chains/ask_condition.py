@@ -3,8 +3,14 @@ ASK_CONDITION_CONST = \
  "outputs": {"questions": """a js array of elements. Each element should contains 2 properties:
  question: str // the question.
  options: str // a js array of answers for the question."""},
-"template": """You are buying a secondhand {product}.
-Please ask top {n_top} questions about the features which are required to know when buying a {product}
+"template": """You are inspecting a secondhand {product}.
+Please come up with {n_top} questions that will allow you to gather more information about the following criteria, which are delimited by triple backquotes.
+
+```
+1. Trouble in functioning.
+2. Current condition.
+```
+
 {format_instructions}.
 Questions:"""}
 
