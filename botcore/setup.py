@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 
 def load_my_env():
     env_path = os.path.dirname(__file__)
-    load_dotenv(f'{env_path}/.env')
+    load_dotenv(f'{env_path}/../.streamlit/.env')
 
 ## TRACE
 
@@ -13,9 +13,9 @@ def trace_openai(session: str) -> OpenAI:
     enable_tracing(session)
     return get_openai_model()
 
-def trace_ai21(session: str) -> AI21:
+def trace_ai21(session: str = "vechai") -> AI21:
     enable_tracing(session)
-    return get_ai21_model()
+    return get_ai21_model(max_tokens = 400)
 
 def trace_chat_openai(session: str) -> ChatOpenAI:
     enable_tracing(session)
