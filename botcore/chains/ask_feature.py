@@ -2,10 +2,10 @@ ASK_FEATURE_CONST = \
 {"inputs":["product", "n_top"],
  "outputs": {"questions": """a js array of elements. Each element should contains 2 properties:
  question: str // the question.
- options: str // a js array of answers for the question. This array's length must not be greater than 5."""},
-"template": """You are buying a secondhand {product}.
-Please ask top {n_top} questions about the features which are required to know when buying a {product}
-{format_instructions}.
+ options: str // a js array of options for the question along with its correct unit. There should not be more than 5 options."""},
+"template": """You are interesting in a {product}.
+Please ask top {n_top} questions about the features of the {product}.
+{format_instructions}
 Questions:"""}
 
 from langchain.llms import BaseLLM
