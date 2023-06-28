@@ -1,12 +1,11 @@
 GENERATE_ANSWER_CONST = \
 {"inputs":["product", "question"],
- "outputs": {"options": """a js array of possible answers for each question. The array's length should be greater than 5."""},
+ "outputs": {"options": """a js array of possible answers for the question. The array's length should be greater than 5."""},
 "template": """You are interesting in a {product}.
-Given a question delimited by triple backquotes.
+Given a question about a {product} delimited by triple backquotes.
 ```
 {question}
 ```
-Please generate all best 5 possible answers for the given question.
 {format_instructions}
 Choices:"""}
 

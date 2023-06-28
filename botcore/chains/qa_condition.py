@@ -4,11 +4,12 @@ ASK_CONDITION_CONST = \
  question: str // the question.
  options: str // a js array of answers for the question. The array's length must not be greater than 5."""},
 "template": """You are inspecting a secondhand {product}.
-Please come up with exactly {n_top} common questions that will allow you to gather more information about the following criteria, which are delimited by triple backquotes.
+Please come up with exactly {n_top} questions that will allow you to gather more information about the following criteria which are delimited by triple backquotes.
 
 ```
-1. Trouble in functioning.
+1. Any malfunctions, defections.
 2. Current physical condition.
+3. Warranty (if the product is an eletronic device)
 ```
 
 {format_instructions}.

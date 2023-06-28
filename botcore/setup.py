@@ -15,7 +15,7 @@ def trace_openai(session: str) -> OpenAI:
 
 def trace_ai21(session: str = "vechai") -> AI21:
     enable_tracing(session)
-    return get_ai21_model(max_tokens = 400)
+    return get_ai21_model(model_name="j2-ultra",max_tokens = 400)
 
 def trace_chat_openai(session: str) -> ChatOpenAI:
     enable_tracing(session)
