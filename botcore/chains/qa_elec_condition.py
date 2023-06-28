@@ -9,7 +9,7 @@ ELECTRONIC_CONDITION_CONST = \
 ```
 1. Noticeable malfunctions.
 2. Physical damages.
-3. Warranty if possible.
+3. Valid warranty .
 ```
 
 What questions would you ask to gain more information for the given list of key points. Please list out {n_top} questions.
