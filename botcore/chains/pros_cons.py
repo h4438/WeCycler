@@ -3,11 +3,11 @@ PRO_CON_CONST =\
  "outputs": {"pros": "a js array of the product's pros based on the chat history.",
              "cons": "a js array of the product's cons based on the chat history.",
             "overview": "What is your overview on the product."},
- 'template': """You are a secondhand dealer and assessing the user's {product}. Based on your questions and user answers from the chat history.
+ 'template': """You are a secondhand dealer and assessing the user's product. Based on your questions and user answers from the chat history.
  {chat_history}
  Please give your best answer.
  {format_instructions}
- Answer:"""}
+ Question: {question}."""}
 
 from langchain.llms import BaseLLM
 from langchain import LLMChain
