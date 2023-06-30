@@ -1,5 +1,5 @@
 ASSESS_ELEC_CONST =\
-{"inputs": ['question', "chat_history", "product"],
+{"inputs": ['question', "chat_history"],
  "outputs": {"useable": "Is the given product still useable.",
              "reason": "A reason why the product is useable or not useable.",
              "function": "Assess how well the given product still can function."},
@@ -19,7 +19,7 @@ from botcore.utils.prompt_utils import build_prompt
 def build_assess_elec_usage(model: BaseLLM, memory):
     """
     Chain is designe
-    Input: chain({"product": product, "question": "Do you think that it will function well in the future?"})
+    Input: chain({"question": "Do you think that it will function well in the future?"})
     """
     inputs = ASSESS_ELEC_CONST['inputs']
     outputs = ASSESS_ELEC_CONST['outputs']

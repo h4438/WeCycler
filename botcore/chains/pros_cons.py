@@ -1,5 +1,5 @@
 PRO_CON_CONST =\
-{"inputs": ["chat_history", "product"],
+{"inputs": ["chat_history", "question"],
  "outputs": {"pros": "a js array of the product's pros based on the chat history.",
              "cons": "a js array of the product's cons based on the chat history.",
             "overview": "What is your overview on the product."},
@@ -19,7 +19,7 @@ from botcore.utils.prompt_utils import build_prompt
 def build_pros_cons_chain(model: BaseLLM, memory):
     """
     Chain is designed to answer questions about pros and cons.
-    Input: chain({"product": product})
+    Input: chain({"question": question})
     """
     inputs = PRO_CON_CONST['inputs']
     outputs = PRO_CON_CONST['outputs']
