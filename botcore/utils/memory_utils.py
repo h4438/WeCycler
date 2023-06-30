@@ -18,6 +18,11 @@ class QAMemory():
         return True
             
 
+    def load_all(self, product: str, questions: List[str], answers: List[str]):
+        self.load_product_context(product)
+        self.load_qa_to_memory(questions, answers)
+        print("Load done")
+    
     def load_product_context(self, product: str):
         
         self.memory.chat_memory.add_user_message(f"I have this used {product} of mine. Please ask me some questions about it.")
