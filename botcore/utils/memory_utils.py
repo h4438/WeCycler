@@ -6,9 +6,9 @@ from langchain.memory import ConversationBufferMemory
 
 class QAMemory():
 
-    def __init__(self):
+    def __init__(self, input_key: str):
 
-        self.memory = ConversationBufferMemory(memory_key="chat_history")
+        self.memory = ConversationBufferMemory(memory_key="chat_history", input_key=input_key)
              
     
     def load_qa_to_memory(self, questions: List[str], answers: List[str]):
