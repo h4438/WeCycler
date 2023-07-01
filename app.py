@@ -4,10 +4,10 @@ import sys
 import os 
 import json
 from streamlit_option_menu import option_menu
-
+import redis
 
 import streamlit as st
-# import streamlit.components.v1 as components
+
 sys.path.append(f'{os.path.dirname(__file__)}/../')
 from botcore.chains.qa_elec_condition import build_ask_electronic_condition_chain
 from botcore.utils.json_parser import parse_nested_json
@@ -15,6 +15,23 @@ from botcore.utils.json_parser import parse_nested_json
 from botcore.setup import trace_ai21
 
 
+def hide_hamburger():
+
+    hide_streamlit_style = """
+                <style>
+                #MainMenu {visibility: hidden;}
+                footer {visibility: hidden;}
+                .css-18ni7ap {
+                position: static !important; 
+                top: auto !important; 
+                left: auto !important; 
+                right: auto !important; 
+                height: auto !important;
+            }
+
+                </style>
+                """
+    st.markdown(hide_streamlit_style, unsafe_allow_html=True)
 def set_bg_hack_url():
     '''
     A function to unpack an image from url and set as bg.
@@ -26,29 +43,29 @@ def set_bg_hack_url():
     st.markdown(
          f"""
         <style>
+          
             .stApp {{
             background: url("https://cdn.pixabay.com/photo/2017/08/06/01/56/bulb-2587637_1280.jpg"), linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.8));
             background-position: center;
             background-blend-mode: multiply;
-            border: 20px solid #1fc724; /* đóng khung ảnh với màu #1fc724 và độ rộng là 10px */
+            
          }}
-            </style>
+         
+        </style>
          """,
          unsafe_allow_html=True
      )
     
-
+hide_hamburger()
 set_bg_hack_url()
-st.header("Hi CyE")
 
-
-selected_options = option_menu(None, ["Home", "Upload",  "Profile", 'Settings'], 
+selected_options = option_menu(None, ["weCycler", "Feature",  "Profile", 'Settings'], 
     icons=['house', 'cloud-upload', "list-task", 'gear'], 
     menu_icon="cast", default_index=0, orientation="horizontal",
     styles={
         "container": {"padding": "0!important", "background-color": "#a5e69f"},
         "icon": {"color": "#76b31d", "font-size": "25px"}, 
-        "nav-link": {"font-size": "25px", "text-align": "left", "margin":"0px", "--hover-color": "#76b31d"},
+        "nav-link": {"font-size": "15px", "text-align": "left", "margin":"0px", "--hover-color": "#76b31d"},
         "nav-link-selected": {"background-color": "#1fc724"},
     }
 )
@@ -80,6 +97,22 @@ def chat(input_user):
 
     return features
 
+
+# password = 'FjtchjsYHG1UGQ6tnyha0ZOYg5dajwUq'
+# r = redis.Redis(
+#   host='redis-17428.c9.us-east-1-4.ec2.cloud.redislabs.com',
+#   port=17428,
+#   password=password)
+
+
+# def save_to_redis(data, key):
+#     r.set(key, str(data))
+
+
+
+
+
+
 if "user_text" not in st.session_state:
     st.session_state.user_text = ""
 if "past" not in st.session_state:
@@ -88,18 +121,19 @@ if "boxselect" not in st.session_state:
     st.session_state.boxselect = {}
 
 
-if selected_options == 'Home':
-
-    with st.expander("Chat Now!!!"):
-        st.session_state.user_text = st.text_input("Type your message", key="user_input")
-
-        
-        button_1 = st.button("Submit") 
-        if st.session_state.get('button') != True:
-            st.session_state['button'] = button_1    
+if selected_options == 'weCycler':
 
 
-        if st.session_state['button'] == True:
+    st.session_state.user_text = st.text_input("Type your message", key="user_input")
+
+    
+    button_1 = st.button("Submit") 
+    if st.session_state.get('button') != True:
+        st.session_state['button'] = button_1    
+
+
+    if st.session_state['button'] == True:
+        with st.spinner('Wait for it...'):
             st.session_state.past.append(st.session_state.user_text)
             message(st.session_state.user_text,is_user=True, key=str("hello") + "_user",avatar_style="adventurer", # change this for different user icon
                 seed=123,)
@@ -107,31 +141,29 @@ if selected_options == 'Home':
             response = chat(str(st.session_state.user_text))
             data = parse_nested_json(response['result'])
 
-            response = "hi"
-            # Routing class 
-            
-            if response:
-                message("I want to know more your products. Please answer this: ")
-                list_answer = {}
-                with st.form(key='my_form'):
-                    number = st.number_input('numbers:')
-                    for i, item in enumerate(data): 
-                        if item['question'] not in st.session_state.boxselect:
-                            st.session_state.boxselect[item['question']] = ""
+        # Routing class 
+        
+        if response:
+            message("I want to know more your products. Please answer this: ")
+            list_answer = {}
+            with st.form(key='my_form'):
+                number = st.number_input('numbers:')
+                for i, item in enumerate(data): 
+                    if item['question'] not in st.session_state.boxselect:
+                        st.session_state.boxselect[item['question']] = ""
 
-                        st.session_state.boxselect[item['question']] = st.selectbox(
-                            item['question'],
-                            tuple(item['options']),
-                            index=item['options'].index(st.session_state.boxselect[item['question']]) if st.session_state.boxselect[item['question']] in item['options'] else 0,
-                            key=f"{item['question']}"
-                        )    
-                        list_answer[item['question']] = st.session_state.boxselect[item['question']]
-                        #list_answer.append(st.session_state.boxselect[item['question']])
-                    list_answer['number'] = number
-                    if st.form_submit_button('Submit Your answer'):
-                        st.write(list_answer)
-                        st.session_state['button'] = False
+                    st.session_state.boxselect[item['question']] = st.selectbox(
+                        item['question'],
+                        tuple(item['options']),
+                        index=item['options'].index(st.session_state.boxselect[item['question']]) if st.session_state.boxselect[item['question']] in item['options'] else 0,
+                        key=f"{item['question']}"
+                    )    
+                    list_answer[item['question']] = st.session_state.boxselect[item['question']]
+                    #list_answer.append(st.session_state.boxselect[item['question']])
+                list_answer['number'] = number
+                if st.form_submit_button('Submit Your answer'):
+                    st.write(list_answer)
+                    st.session_state['button'] = False
                     
                         
-                    #submit_button = st.form_submit_button(label='Submit')
-
+                  
