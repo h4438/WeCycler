@@ -3,7 +3,7 @@ ASSESS_ELEC_CONST =\
  "outputs": {"useable": "Is the given product still useable.",
              "reason": "A reason why the product is useable or not useable.",
              "function": "Assess how well the given product still can function."},
- 'template': """You are a secondhand dealer and assessing the user's {product}. Based on your questions and user answers from the chat history.
+ 'template': """You are a secondhand dealer and assessing the user's product. Based on your questions and user answers from the chat history.
  {chat_history}
  Please give your best answer for the given question from the user.
  {format_instructions}
