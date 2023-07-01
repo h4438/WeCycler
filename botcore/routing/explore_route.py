@@ -6,7 +6,7 @@ from botcore.chains.qa_feature import build_ask_feature_chain
 from botcore.chains.qa_condition import build_ask_condition_chain
 from botcore.utils.json_parser import parse_nested_json
 
-class FeaturesExplorer():
+class FeatureExplorer():
     
     def __init__(self, model: BaseLLM, redis):
         
@@ -26,7 +26,7 @@ class FeaturesExplorer():
 
         return self.parse_all(feat_qa[output_key], cond_qa[output_key])
     
-    def parse_all(feat_json_str: str, cond_json_str: str):
+    def parse_all(self, feat_json_str: str, cond_json_str: str):
         feats = parse_nested_json(feat_json_str)
         conds = parse_nested_json(cond_json_str)
         return feats, conds
@@ -35,11 +35,15 @@ class FeaturesExplorer():
         self.redis.set(q_key, qa)
         return True
 
+    
+    def get_qa(self, q_key: str):
+        return self.redis.get(q_key)
+        
 
     def ask_user(self, product: str, n_top: int=4):
         key = f"{product}_{n_top}"
-        feat_qa = self.redis(f'{key}_feat')
-        cond_qa = self.redis(f'{key}_cond')
+        feat_qa = self.get_qa(f'{key}_feat')
+        cond_qa = self.get_qa(f'{key}_cond')
         if feat_qa is None or cond_qa is None:
             return self.generate_qa(product, n_top)
         return self.parse_all(feat_qa, cond_qa)
