@@ -90,6 +90,78 @@ def chat(input_user):
 # with st.expander("Chat Now!!!"):       
 #     get_user_input()
 
+# if "user_text" not in st.session_state:
+#     st.session_state.user_text = ""
+# if "past" not in st.session_state:
+#     st.session_state.past = []
+# if "boxselect" not in st.session_state:
+#     st.session_state.boxselect = {}
+
+
+# with st.expander("Chat Now!!!"):
+
+#     st.session_state.user_text = st.text_input("Type your message", key="user_input")
+
+#     if st.button("Submit"):
+#         st.session_state.past.append(st.session_state.user_text)
+#         message(st.session_state.user_text,is_user=True, key=str("hello") + "_user",avatar_style="adventurer", # change this for different user icon
+#             seed=123,)
+
+#         #response = chat(str(st.session_state.user_text))
+#         #data = parse_nested_json(response['result'])
+
+#         # Routing class 
+        
+#         if st.session_state.user_text:
+#             message("I want to know more your products. Please answer this: ")
+
+#             with st.form(key='my_form'):
+#                 # for i, item in enumerate(data): 
+#                 #     if item['question'] not in st.session_state.boxselect:
+#                 #         st.session_state.boxselect[item['question']] = ""
+
+#                 #     st.session_state.boxselect[item['question']] =  st.selectbox(
+#                 #         item['question'],
+#                 #         tuple(item['options']),
+#                 #         index=item['options'].index(st.session_state.boxselect[item['question']]) if st.session_state.boxselect[item['question']] in item['options'] else 0,
+#                 #         key=f"{item['question']}"
+#                 #     )
+#                 st.write("show ")
+#                 #st.write(st.session_state.boxselect[item['question']])
+
+#                 submit_button = st.form_submit_button(label='Submit')
+#                 if submit_button:
+#                     st.write("Submit button clicked")
+                # if submit_button:
+                #     for item in data:
+                #         if st.session_state.boxselect[item['question']]:
+                #             st.write('**Answer:**', st.session_state.boxselect[item['question']])
+                #         else:
+                #             st.write('**No answer selected for question:**', item['question'])
+
+                #     st.write(data)
+# if st.session_state.user_text: 
+#     st.session_state.past.append(st.session_state.user_text)
+#     message(st.session_state.user_text,is_user=True, key=str("hello") + "_user")
+#     #st.session_state.generated.append()
+#     response = chat(str(st.session_state.user_text))
+#     #response = processing(str(response))
+#     data = parse_nested_json(response['result'])
+
+#     if response:
+#         message(str(response))
+#         for i in data: 
+            
+#             boxselect = st.radio(
+#             i['question'],
+#             tuple(i['options']),
+#             horizontal=True)
+            
+            
+#             if boxselect:
+#                 st.write('**Answer:**',boxselect)
+
+
 if "user_text" not in st.session_state:
     st.session_state.user_text = ""
 if "past" not in st.session_state:
@@ -97,13 +169,16 @@ if "past" not in st.session_state:
 if "boxselect" not in st.session_state:
     st.session_state.boxselect = {}
 
-
 with st.expander("Chat Now!!!"):
-    
-
     st.session_state.user_text = st.text_input("Type your message", key="user_input")
 
-    if st.button("Submit"):
+    
+    button_1 = st.button("Submit") 
+    if st.session_state.get('button') != True:
+        st.session_state['button'] = button_1    
+
+
+    if st.session_state['button'] == True:
         st.session_state.past.append(st.session_state.user_text)
         message(st.session_state.user_text,is_user=True, key=str("hello") + "_user",avatar_style="adventurer", # change this for different user icon
             seed=123,)
@@ -111,12 +186,14 @@ with st.expander("Chat Now!!!"):
         response = chat(str(st.session_state.user_text))
         data = parse_nested_json(response['result'])
 
+        response = "hi"
         # Routing class 
         
         if response:
             message("I want to know more your products. Please answer this: ")
-
+            list_answer = {}
             with st.form(key='my_form'):
+                number = st.number_input('numbers:')
                 for i, item in enumerate(data): 
                     if item['question'] not in st.session_state.boxselect:
                         st.session_state.boxselect[item['question']] = ""
@@ -126,12 +203,16 @@ with st.expander("Chat Now!!!"):
                         tuple(item['options']),
                         index=item['options'].index(st.session_state.boxselect[item['question']]) if st.session_state.boxselect[item['question']] in item['options'] else 0,
                         key=f"{item['question']}"
-                    )
+                    )    
+                    list_answer[item['question']] = st.session_state.boxselect[item['question']]
+                    #list_answer.append(st.session_state.boxselect[item['question']])
+                list_answer['number'] = number
+                if st.form_submit_button('Submit Your answer'):
+                    st.write(list_answer)
+                    st.session_state['button'] = False
+                  
+                    
+                #submit_button = st.form_submit_button(label='Submit')
 
-                submit_button = st.form_submit_button(label='Submit')
-                
-            if submit_button:
-                for item in data:
-                    if st.session_state.boxselect[item['question']]:
-                        st.write('**Answer:**', st.session_state.boxselect[item['question']])
+    
 
