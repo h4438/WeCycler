@@ -2,6 +2,7 @@ from langchain.llms import OpenAI, AI21
 from langchain.chat_models import ChatOpenAI, PromptLayerChatOpenAI
 import os
 from dotenv import load_dotenv
+from langchain.embeddings import OpenAIEmbeddings
 
 def load_my_env():
     env_path = os.path.dirname(__file__)
@@ -31,6 +32,12 @@ def get_chat_openai(model_name: str = 'text-davinci-003' ,max_tokens: int = 256)
     return model
 
 ## MODELS
+
+def get_openai_embedding():
+    load_my_env()
+    emb = OpenAIEmbeddings()
+    print("OPEN AI Embedding ready")
+    return emb
 
 def get_openai_model(model_name: str = 'text-davinci-003' ,max_tokens: int = 256) -> OpenAI:
     load_my_env()
