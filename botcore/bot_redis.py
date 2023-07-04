@@ -64,9 +64,7 @@ class RedisVectorDB:
         return self.search_doc(stock_data, 'wanted')
 
     def search_doc(self, data: Dict, index_name: str):
-        if self.redis is None:
-            print("Redis is not initialized. Please add a document first")
-            return False
+        self.add_new_stock(data)
         doc = self.json_to_doc(data, {"type": index_name})
         query = doc.page_content
         try:

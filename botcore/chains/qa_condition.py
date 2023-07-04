@@ -9,7 +9,7 @@ Please come up with exactly {n_top} common questions that will allow you to gath
 ```
 * Any malfunctions, defections.
 * Current physical condition.
-* Check warranty.
+* Check warranty if the product is an electronic device.
 ```
 
 {format_instructions}.
