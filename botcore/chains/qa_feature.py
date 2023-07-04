@@ -1,6 +1,6 @@
 ASK_FEATURE_CONST = \
 {"inputs":["product", "n_top"],
- "outputs": {"questions": """a js array of elements. Each element should contains 2 properties:
+        "outputs": {"chain": "always return 'ask_feature'","questions": """a js array of elements. Each element should contains 2 properties:
  question: str // the question.
  options: str // a js array of options for the question along with its correct unit. There should not be more than 5 options."""},
 "template": """You are interesting in a {product}.
