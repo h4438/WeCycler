@@ -4,67 +4,28 @@ import sys
 import os 
 import json
 from streamlit_option_menu import option_menu
-import redis
+import re
+import html
 
 
 sys.path.append(f'{os.path.dirname(__file__)}/../')
-from botcore.chains.qa_elec_condition import build_ask_electronic_condition_chain
+from botcore.chains.qa_feature import build_ask_feature_chain
+from botcore.chains.qa_condition import build_ask_condition_chain
 from botcore.utils.json_parser import parse_nested_json
-
 from botcore.setup import trace_ai21
+
+from src.components.format_message import *
+
 
 st.set_page_config(
         page_title="Wecycler",
         page_icon="🌳",
     )
 
-def hide_hamburger():
-
-    hide_streamlit_style = """
-                <style>
-                #MainMenu {visibility: hidden;}
-                footer {visibility: hidden;}
-                
-                .css-18ni7ap {
-                position: static !important; 
-                top: auto !important; 
-                left: auto !important; 
-                right: auto !important; 
-                height: auto !important;
-            }
-
-                </style>
-                """
-    st.markdown(hide_streamlit_style, unsafe_allow_html=True)
-def set_bg_hack_url():
-    '''
-    A function to unpack an image from url and set as bg.
-    Returns
-    -------
-    The background.
-    '''
-        
-    st.markdown(
-         f"""
-        <style>
-          
-            .stApp {{
-            background: url("https://cdn.pixabay.com/photo/2017/08/06/01/56/bulb-2587637_1280.jpg"), linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.8));
-            background-position: center;
-            background-blend-mode: multiply;
-            
-         }}
-         
-        </style>
-         """,
-         unsafe_allow_html=True
-     )
-    
 hide_hamburger()
 set_bg_hack_url()
-
-selected_options = option_menu(None, ["weCycler", "Feature",  "Profile", 'Settings'], 
-    icons=['house', 'cloud-upload', "list-task", 'gear'], 
+selected_options = option_menu(None, ["📝Analytics",  "💬chat Bot"], 
+    icons=['📝', '🔎'], 
     menu_icon="cast", default_index=0, orientation="horizontal",
     styles={
         "container": {"padding": "0!important", "background-color": "#a5e69f"},
@@ -75,32 +36,16 @@ selected_options = option_menu(None, ["weCycler", "Feature",  "Profile", 'Settin
 )
 
 
-
-def processing(input):
-    data = """{input}""".format(input=input)
-
-    # Extract the JSON content
-    json_start = data.find("```json")
-    json_end = data.find("```", json_start + len("```json"))
-    json_content = data[json_start + len("```json"):json_end]
-
-    # Remove newlines from the JSON content
-    json_content = json_content.replace('\n', '')
-
-    # Load the JSON content into a Python dictionary
-    data_dict = json.loads(json_content)
-
-    return data_dict
-
-
-
 def chat(input_user):
     MODEL = trace_ai21()
-    ask_feature = build_ask_electronic_condition_chain(MODEL)
-    features = ask_feature({"product": input_user, "n_top": 3})
-
+    ask_feature = build_ask_feature_chain(MODEL)
+    features = ask_feature({"product": input_user, "n_top": 4})
+    
+    # ask_conditions = build_ask_condition_chain(MODEL)
+    # conditions = ask_conditions({"product": input_user, "n_top": 3})
+    # 6 questions 8 questions -> function
+    print(features)
     return features
-
 
 
 
@@ -111,17 +56,35 @@ if "past" not in st.session_state:
 if "boxselect" not in st.session_state:
     st.session_state.boxselect = {}
 
+if "question" not in st.session_state:
+    st.session_state.question = 3    
+    
+if "number_quantity" not in st.session_state:
+    st.session_state.number_quantity = 1
 
-if selected_options == 'weCycler':
-
-
+if selected_options == '📝Analytics':
+    with open("src/components/UI/test.md", "r") as sidebar_file:
+        sidebar_content = sidebar_file.read()    
+    st.sidebar.markdown(sidebar_content)
+    
+    
     st.session_state.user_text = st.text_input("Type your message", key="user_input")
 
+    col_number, col_qua = st.columns(2)
     
+    with col_number:
+        st.number_input("Number of question",1, 10, 1)
+        
+    with col_qua:
+        number_qua = st.number_input('Trash Quantity:',min_value=1,step=1)
+
+        if number_qua > 1: 
+            st.session_state.number_quantity = number_qua
+        
+        
     button_1 = st.button("Submit") 
     if st.session_state.get('button') != True:
         st.session_state['button'] = button_1    
-
 
     if st.session_state['button'] == True:
         with st.spinner('Wait for it...'):
@@ -135,10 +98,14 @@ if selected_options == 'weCycler':
         # Routing class 
         
         if response:
-            message("I want to know more your products. Please answer this: ")
+            st.balloons()
+            message("Let's learn more about your products. Please answer the following questions: ")
             list_answer = {}
+            metadata_feature, metadata_conditions = [], []
+            #number = st.number_input('Trash Quantity:',min_value=1,step=1)
+            
             with st.form(key='my_form'):
-                number = st.number_input('numbers:')
+                message("Features: ")
                 for i, item in enumerate(data): 
                     if item['question'] not in st.session_state.boxselect:
                         st.session_state.boxselect[item['question']] = ""
@@ -149,12 +116,58 @@ if selected_options == 'weCycler':
                         index=item['options'].index(st.session_state.boxselect[item['question']]) if st.session_state.boxselect[item['question']] in item['options'] else 0,
                         key=f"{item['question']}"
                     )    
-                    list_answer[item['question']] = st.session_state.boxselect[item['question']]
-                    #list_answer.append(st.session_state.boxselect[item['question']])
-                list_answer['number'] = number
-                if st.form_submit_button('Submit Your answer'):
+                    metadata_feature.append(st.session_state.boxselect[item['question']])
+                
+                list_answer['name'] = st.session_state.user_text
+                list_answer['features'] = metadata_feature
+                
+                list_answer['Quantity'] = st.session_state.number_quantity
+                if st.form_submit_button('Confirm Responses'):
                     st.write(list_answer)
                     st.session_state['button'] = False
-                    
-                        
-                  
+
+
+INITIAL_MESSAGE = [
+    {"role": "user", "content": "Hi!"},
+    {
+        "role": "assistant",
+        "content": "Hi there! I'm your Recycling Assistant, designed to help manage and understand your recycling needs. I can provide insights into your waste, help update your recycling preferences, connect you with matching recycling agents, and customize settings to suit your requirements. Let's start recycling smarter together!",
+    },
+]
+
+
+
+if selected_options == '💬chat Bot':
+    
+    col1, col2 = st.columns((4, 1)) 
+    styles_content = """
+    <style> #input-container { position: fixed; bottom: 0; width: 100%; padding: 10px; background-color: white; z-index: 100; } h1 { font-family: 'Roboto Slab', serif; } .user-avatar { float: right; width: 40px; height: 40px; margin-left: 5px; margin-bottom: -10px; border-radius: 50%; object-fit: cover; } .bot-avatar { float: left; width: 40px; height: 40px; margin-right: 5px; border-radius: 50%; object-fit: cover; } </style>    
+    """
+    st.write(styles_content, unsafe_allow_html=True)
+    
+    
+    # Initialize the chat messages history
+    if "messages" not in st.session_state.keys():
+        st.session_state["messages"] = INITIAL_MESSAGE
+
+    if "history" not in st.session_state:
+        st.session_state["history"] = []
+    with col1:
+        if prompt := st.text_input(""):
+            st.session_state.messages.append({"role": "user", "content": prompt})
+    
+    with col2: 
+        customize_button()
+        if st.button("Reset Chat"):
+            for key in st.session_state.keys():
+                del st.session_state[key]
+            st.session_state["messages"] = INITIAL_MESSAGE
+            st.session_state["history"] = []
+        
+    for message in st.session_state.messages:
+        message_func(
+            message["content"],
+            True if message["role"] == "user" else False,
+            True if message["role"] == "data" else False,
+        )
+
