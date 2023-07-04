@@ -15,6 +15,14 @@ from botcore.utils.json_parser import parse_nested_json
 from botcore.setup import trace_ai21
 
 from src.components.format_message import *
+from botcore.setup import get_ai21_model, enable_tracing
+from botcore.bot_redis import connect_redis
+from botcore.routing.explore_route import FeatureExplorer
+
+
+# redis
+from botcore.bot_redis import RedisVectorDB
+from botcore.test_data import TEST_WANTED_DATA 
 
 
 st.set_page_config(
@@ -36,16 +44,22 @@ selected_options = option_menu(None, ["📝Analytics",  "💬chat Bot"],
 )
 
 
-def chat(input_user):
-    MODEL = trace_ai21()
-    ask_feature = build_ask_feature_chain(MODEL)
-    features = ask_feature({"product": input_user, "n_top": 4})
+def chat(input_user, nums):
+    MODEL = get_ai21_model(max_tokens = 400)
+    enable_tracing("ask_demo")
+
+    db = connect_redis()
+    explorer = FeatureExplorer(MODEL, db)
+    feat, cond = explorer.ask_user(input_user, nums)
+    
     
     # ask_conditions = build_ask_condition_chain(MODEL)
     # conditions = ask_conditions({"product": input_user, "n_top": 3})
     # 6 questions 8 questions -> function
-    print(features)
-    return features
+    
+    result = feat['questions']
+    result.extend(cond['questions'])
+    return result
 
 
 
@@ -62,6 +76,10 @@ if "question" not in st.session_state:
 if "number_quantity" not in st.session_state:
     st.session_state.number_quantity = 1
 
+if "nums_Q" not in st.session_state:
+     st.session_state.nums_Q = 1
+
+
 if selected_options == '📝Analytics':
     with open("src/components/UI/test.md", "r") as sidebar_file:
         sidebar_content = sidebar_file.read()    
@@ -73,8 +91,9 @@ if selected_options == '📝Analytics':
     col_number, col_qua = st.columns(2)
     
     with col_number:
-        st.number_input("Number of question",1, 10, 1)
-        
+        nums_Q = st.number_input("Number of question",1, 10, 1)
+        if nums_Q > 2:
+            st.session_state.nums_Q  = nums_Q
     with col_qua:
         number_qua = st.number_input('Trash Quantity:',min_value=1,step=1)
 
@@ -92,12 +111,12 @@ if selected_options == '📝Analytics':
             message(st.session_state.user_text,is_user=True, key=str("hello") + "_user",avatar_style="adventurer", # change this for different user icon
                 seed=123,)
 
-            response = chat(str(st.session_state.user_text))
-            data = parse_nested_json(response['result'])
+            data = chat(str(st.session_state.user_text),  st.session_state.nums_Q)
+            #data = parse_nested_json(response['result'])
 
         # Routing class 
         
-        if response:
+        if data:
             st.balloons()
             message("Let's learn more about your products. Please answer the following questions: ")
             list_answer = {}
@@ -105,7 +124,7 @@ if selected_options == '📝Analytics':
             #number = st.number_input('Trash Quantity:',min_value=1,step=1)
             
             with st.form(key='my_form'):
-                message("Features: ")
+                message(f"Features:{st.session_state.nums_Q} + Conditions: {st.session_state.nums_Q} ")
                 for i, item in enumerate(data): 
                     if item['question'] not in st.session_state.boxselect:
                         st.session_state.boxselect[item['question']] = ""
@@ -116,14 +135,21 @@ if selected_options == '📝Analytics':
                         index=item['options'].index(st.session_state.boxselect[item['question']]) if st.session_state.boxselect[item['question']] in item['options'] else 0,
                         key=f"{item['question']}"
                     )    
-                    metadata_feature.append(st.session_state.boxselect[item['question']])
+                    metadata_feature.append(str(item['question'])+ " " + str(st.session_state.boxselect[item['question']]))
                 
-                list_answer['name'] = st.session_state.user_text
+                list_answer['title'] = st.session_state.user_text
                 list_answer['features'] = metadata_feature
                 
-                list_answer['Quantity'] = st.session_state.number_quantity
+                #list_answer['Quantity'] = st.session_state.number_quantity
                 if st.form_submit_button('Confirm Responses'):
-                    st.write(list_answer)
+                    with st.spinner('I loading...'):
+                        redis_db = RedisVectorDB()
+                        data = TEST_WANTED_DATA
+                        [redis_db.add_new_wanted(a) for a in data]
+                        
+                        st.write(list_answer)
+                        b = redis_db.search_wanted(data)
+                    st.write(b)
                     st.session_state['button'] = False
 
 
