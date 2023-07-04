@@ -25,21 +25,21 @@ class RedisVectorDB:
         print("Vector DB is ready")
         
     
-    def json_to_doc(self, data: Dict) -> Document:
+    def json_to_doc(self, data: Dict, meta_info: Dict = None) -> Document:
         """
             data = {"title": str, "features": [], "post_id": str, ...}
         """
         feats = ", ".join([i for i in data['features']])
         txt = f"{data['title']}. {feats}"
-        return Document(page_content=txt, metadata={"post_id": data['post_id'], "user_id": data['user_id']})
+        return Document(page_content=txt, metadata=meta_info)
 
     ## add
     def add_new_wanted(self, data: Dict):
-        doc = self.json_to_doc(data)
+        doc = self.json_to_doc(data, {"type": "wanted"})
         return self.add_new_doc(doc, 'wanted')
 
     def add_new_stock(self, data: Dict):
-        doc = self.json_to_doc(data)
+        doc = self.json_to_doc(data, {"type": "stock"})
         return self.add_new_doc(doc, 'stock')
     
     def add_new_doc(self, doc: Document, index_name: str):
