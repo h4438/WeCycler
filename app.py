@@ -170,4 +170,3 @@ if selected_options == '💬chat Bot':
             True if message["role"] == "user" else False,
             True if message["role"] == "data" else False,
         )
-
