@@ -23,7 +23,6 @@ class RedisVectorDB:
         self.redis = {'wanted': None, 'stock': None}
         self.limit = 0.2
         print("Vector DB is ready")
-        
     
     def json_to_doc(self, data: Dict, meta_info: Dict = None) -> Document:
         """
@@ -54,16 +53,18 @@ class RedisVectorDB:
             return False
     
     ## search
-    def search_stock(self, wanted_query: str):
-        return self.search_doc(wanted_query, "stock")
+    def search_stock(self, wanted_data: str):
+        return self.search_doc(wanted_data, "stock")
 
-    def search_wanted(self, stock_query: str):
-        return self.search_doc(stock_query, 'wanted')
+    def search_wanted(self, stock_data: Dict):
+        return self.search_doc(stock_data, 'wanted')
 
-    def search_doc(self, query: str, index_name: str):
+    def search_doc(self, data: Dict, index_name: str):
         if self.redis is None:
             print("Redis is not initialized. Please add a document first")
             return False
+        doc = self.json_to_doc(data)
+        query = doc.page_content
         try:
             results = self.redis[index_name].similarity_search_limit_score(query, score_threshold=self.limit)
             return results
