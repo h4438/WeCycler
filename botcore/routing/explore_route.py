@@ -29,7 +29,7 @@ class FeatureExplorer():
     def parse_all(self, feat_json_str: str, cond_json_str: str):
         feats = parse_nested_json(feat_json_str)
         conds = parse_nested_json(cond_json_str)
-        return feats, conds
+        return [feats, conds]
 
     def set_qa(self, q_key: str, qa: str):
         self.redis.set(q_key, qa)
