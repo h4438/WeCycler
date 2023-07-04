@@ -6,7 +6,6 @@ import json
 from streamlit_option_menu import option_menu
 import redis
 
-import streamlit as st
 
 sys.path.append(f'{os.path.dirname(__file__)}/../')
 from botcore.chains.qa_elec_condition import build_ask_electronic_condition_chain
@@ -14,6 +13,10 @@ from botcore.utils.json_parser import parse_nested_json
 
 from botcore.setup import trace_ai21
 
+st.set_page_config(
+        page_title="Wecycler",
+        page_icon="🌳",
+    )
 
 def hide_hamburger():
 
@@ -21,6 +24,7 @@ def hide_hamburger():
                 <style>
                 #MainMenu {visibility: hidden;}
                 footer {visibility: hidden;}
+                
                 .css-18ni7ap {
                 position: static !important; 
                 top: auto !important; 
@@ -96,19 +100,6 @@ def chat(input_user):
     features = ask_feature({"product": input_user, "n_top": 3})
 
     return features
-
-
-# password = 'FjtchjsYHG1UGQ6tnyha0ZOYg5dajwUq'
-# r = redis.Redis(
-#   host='redis-17428.c9.us-east-1-4.ec2.cloud.redislabs.com',
-#   port=17428,
-#   password=password)
-
-
-# def save_to_redis(data, key):
-#     r.set(key, str(data))
-
-
 
 
 
