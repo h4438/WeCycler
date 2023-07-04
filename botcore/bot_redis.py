@@ -2,21 +2,23 @@ import redis
 import os
 from dotenv import load_dotenv
 from langchain.schema import Document
-from typing import List
+from typing import List, Dict
+import json
+from langchain.vectorstores.redis import Redis
 import sys
 sys.path.append(f"{os.path.dirname(__file__)}/../")
-from botcore.setup import get_openai_embedding
+from botcore.setup import get_openai_embeddings, load_my_env
 
 def connect_redis(host: str = 'localhost', port: int = 6379):
     db = redis.Redis(host = host, port = port, decode_responses=True)
     return db
 
 
- class RedisVectorDB:
+class RedisVectorDB:
 
     def __init__(self):
         load_my_env()
-        self.embeddings = get_openai_embedding()
+        self.embeddings = get_openai_embeddings()
         self.url = os.getenv("REDIS_CLOUD")
         self.redis = {'wanted': None, 'stock': None}
         self.limit = 0.2
@@ -67,4 +69,4 @@ def connect_redis(host: str = 'localhost', port: int = 6379):
             return results
         except:
             print("Error occurred when finding documents")
-            return False       
+            return False
