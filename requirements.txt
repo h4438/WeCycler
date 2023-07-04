@@ -3,4 +3,4 @@ streamlit_chat
 streamlit_option_menu
 redis
 langchain
-dotenv
+python-dotenv
