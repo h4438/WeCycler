@@ -9,5 +9,7 @@ data = TEST_WANTED_DATA
 
 [redis_db.add_new_wanted(a) for a in data]
 
-b = redis_db.search_wanted("I have an old Asus laptop. It has 8 GB RAM.")
+data = {"title": "I have an old phone", "features": ["My laptop has 4 GB RAM", "Is it function well? Well"]}
+
+b = redis_db.search_wanted(data)
 print(b)

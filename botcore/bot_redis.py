@@ -63,7 +63,7 @@ class RedisVectorDB:
         if self.redis is None:
             print("Redis is not initialized. Please add a document first")
             return False
-        doc = self.json_to_doc(data)
+        doc = self.json_to_doc(data, {"type": index_name})
         query = doc.page_content
         try:
             results = self.redis[index_name].similarity_search_limit_score(query, score_threshold=self.limit)
