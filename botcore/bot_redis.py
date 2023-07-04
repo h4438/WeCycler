@@ -9,8 +9,12 @@ import sys
 sys.path.append(f"{os.path.dirname(__file__)}/../")
 from botcore.setup import get_openai_embeddings, load_my_env
 
-def connect_redis(host: str = 'localhost', port: int = 6379):
-    db = redis.Redis(host = host, port = port, decode_responses=True)
+def connect_redis():
+    load_my_env()
+    host = os.getenv("REDIS_HOST")
+    password = os.getenv("REDIS_PASS")
+    port = os.getenv("REDIS_PORT")
+    db = redis.Redis(host = host, port = port, password=password, decode_responses=True)
     return db
 
 
@@ -23,7 +27,6 @@ class RedisVectorDB:
         self.redis = {'wanted': None, 'stock': None}
         self.limit = 0.2
         print("Vector DB is ready")
-        
     
     def json_to_doc(self, data: Dict, meta_info: Dict = None) -> Document:
         """
@@ -54,16 +57,18 @@ class RedisVectorDB:
             return False
     
     ## search
-    def search_stock(self, wanted_query: str):
-        return self.search_doc(wanted_query, "stock")
+    def search_stock(self, wanted_data: str):
+        return self.search_doc(wanted_data, "stock")
 
-    def search_wanted(self, stock_query: str):
-        return self.search_doc(stock_query, 'wanted')
+    def search_wanted(self, stock_data: Dict):
+        return self.search_doc(stock_data, 'wanted')
 
-    def search_doc(self, query: str, index_name: str):
+    def search_doc(self, data: Dict, index_name: str):
         if self.redis is None:
             print("Redis is not initialized. Please add a document first")
             return False
+        doc = self.json_to_doc(data, {"type": index_name})
+        query = doc.page_content
         try:
             results = self.redis[index_name].similarity_search_limit_score(query, score_threshold=self.limit)
             return results

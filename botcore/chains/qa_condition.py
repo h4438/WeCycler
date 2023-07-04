@@ -1,20 +1,19 @@
 ASK_CONDITION_CONST = \
 {"inputs":["product", "n_top"],
- "outputs": {"questions": """a js array of elements. Each element should contains 2 properties:
+ "outputs": {"chain": "always return 'ask_condition'.", "questions": """a js array of elements. Each element should contains 2 properties:
  question: str // the question.
  options: str // a js array of answers for the question. The array's length must not be greater than 5."""},
 "template": """You are inspecting a secondhand {product}.
-Please come up with exactly {n_top} questions that will allow you to gather more information about the following criteria which are delimited by triple backquotes.
+Please come up with exactly {n_top} common questions that will allow you to gather more information about the following criteria, which are delimited by triple backquotes.
 
 ```
-1. Any malfunctions, defections.
-2. Current physical condition.
-3. Warranty (if the product is an eletronic device)
+* Any malfunctions, defections.
+* Current physical condition.
+* Check warranty.
 ```
 
 {format_instructions}.
 Questions:"""}
-
 
 from langchain.llms import BaseLLM
 from langchain import LLMChain
