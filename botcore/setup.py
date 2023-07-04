@@ -35,6 +35,8 @@ def get_chat_openai(model_name: str = 'text-davinci-003' ,max_tokens: int = 256)
 
 def get_openai_embedding():
     load_my_env()
+    ai_pass = os.getenv("OPENAI")
+    os.environ['OPENAI_API_KEY'] = ai_pass
     emb = OpenAIEmbeddings()
     print("OPEN AI Embedding ready")
     return emb
