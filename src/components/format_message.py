@@ -79,7 +79,7 @@ def format_message(text):
 
     formatted_text = ""
     for i in range(len(text_blocks)):
-        formatted_text += text_blocks[i].replace("\n", "<br>")
+        formatted_text += text_blocks[i].replace("\n", "")
         if i < len(code_blocks):
             formatted_text += f'<pre style="white-space: pre-wrap; word-wrap: break-word;"><code>{html.escape(code_blocks[i])}</code></pre>'
 

@@ -171,7 +171,8 @@ INITIAL_MESSAGE = [
 
 def conservationBot(data, inputuser):
     MODEL = trace_ai21()
-    TEMPLATE = """ You are Wecycler, an AI-powered recycling chatbot. You specialize in providing insights about the environment, recycling processes, and the value of secondhand products. You excel at answering a variety of questions in these areas based on previous interactions.
+    TEMPLATE = """ 
+    You are Wecycler, an AI-powered recycling chatbot. You specialize in providing insights about the environment, recycling processes, and the value of secondhand products. You excel at answering a variety of questions in these areas based on previous interactions.
     Chat history: {chat_history}
     Given the question: {question}
     Please, as Wecycler, provide your most informative and helpful response. 
@@ -188,9 +189,15 @@ def conservationBot(data, inputuser):
     ans = chain.run(str(inputuser))
     
     return ans 
+def append_chat_history(question, answer):
+    st.session_state["history"].append((question, answer))
 
-
-
+def append_message(content, role="assistant", display=False):
+    message = {"role": role, "content": content}
+    message_func(content, False, display)
+    st.session_state.messages.append(message)
+    if role != "data":
+        append_chat_history(st.session_state.messages[-2]["content"], content)
 
 if selected_options == '💬chat Bot':
     
@@ -207,6 +214,11 @@ if selected_options == '💬chat Bot':
 
     if "history" not in st.session_state:
         st.session_state["history"] = []
+    
+    if "res" not in st.session_state:
+        st.session_state["res"] = ""
+        
+        
     with col1:
         datas = {
         
@@ -228,8 +240,8 @@ if selected_options == '💬chat Bot':
                 st.session_state.messages.append({"role": "user", "content": prompt})
                 res =   conservationBot(datas, prompt)
                 if res: 
-                    message(res)
-
+                    st.session_state["res"] = res
+                    
 
 
     with col2: 
@@ -246,4 +258,11 @@ if selected_options == '💬chat Bot':
             True if message["role"] == "user" else False,
             True if message["role"] == "data" else False,
         )
+        
     
+    if st.session_state.messages[-1]["role"] != "assistant":
+        content = st.session_state.messages[-1]["content"]
+        if isinstance(content, str):
+            result = st.session_state["res"]
+            append_message(result)
+        
