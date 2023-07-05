@@ -20,6 +20,12 @@ from botcore.bot_redis import connect_redis
 from botcore.routing.explore_route import FeatureExplorer
 
 
+# botchat
+from langchain.chains import ConversationChain, LLMChain
+from langchain.prompts import PromptTemplate
+from botcore.bot_agent import AgentBot
+from botcore.utils.memory_utils import QAMemory
+
 # redis
 from botcore.bot_redis import RedisVectorDB
 from botcore.test_data import TEST_WANTED_DATA 
@@ -165,6 +171,29 @@ INITIAL_MESSAGE = [
     },
 ]
 
+def conservationBot(data, inputuser):
+    MODEL = trace_ai21()
+    TEMPLATE = """ You are Wecycler, an AI-powered recycling chatbot. You specialize in providing insights about the environment, recycling processes, and the value of secondhand products. You excel at answering a variety of questions in these areas based on previous interactions.
+
+    Chat history: {chat_history}
+
+    Given the question: {question}
+
+    Please, as Wecycler, provide your most informative and helpful response."""
+    
+    ques = [i.split("?")[0] for i in data['features']]
+    ans = [i.split("?")[1] for i in data['features']]
+    qa_mem = QAMemory('question')
+    qa_mem.load_all(data['title'], ques, ans)
+    
+    prompt = PromptTemplate(input_variables=["question","chat_history"], template=TEMPLATE)
+    chain = LLMChain(llm=MODEL, prompt=prompt, memory=qa_mem.memory)
+
+    ans = chain.run(str(inputuser))
+    
+    return ans 
+
+
 
 
 if selected_options == '💬chat Bot':
@@ -183,9 +212,28 @@ if selected_options == '💬chat Bot':
     if "history" not in st.session_state:
         st.session_state["history"] = []
     with col1:
+        datas = {
+        "title": "Old phone",
+        "features": [
+            "What is the screen size? 2.8 inches",
+            "What is the RAM size? 512 MB",
+            "What is the storage capacity? 4 GB",
+            "What is the battery capacity? 1500 mAh",
+            "Is there any malfunction or defect? yes",
+            "What is the current physical condition of the product? excellent",
+            "Is the product still under warranty? yes"
+        ]
+    }
+        
         if prompt := st.text_input(""):
-            st.session_state.messages.append({"role": "user", "content": prompt})
-    
+            with st.spinner(text="Loading"):
+                st.session_state.messages.append({"role": "user", "content": prompt})
+                res =   conservationBot(datas, prompt)
+                if res: 
+                    message(res)
+
+
+
     with col2: 
         customize_button()
         if st.button("Reset Chat"):
@@ -200,3 +248,4 @@ if selected_options == '💬chat Bot':
             True if message["role"] == "user" else False,
             True if message["role"] == "data" else False,
         )
+    
