@@ -19,12 +19,12 @@ def connect_redis():
 
 class RedisDB:
 
-    def __init__(self):
+    def __init__(self, limit:int = 0.6, repo_id: str = 'sentence-transformers/all-mpnet-base-v2'):
 
         load_my_env()
-        self.embeddings = get_huggingface_embeddings()
+        self.embeddings = get_huggingface_embeddings(repo_id)
         self.url = os.getenv("REDIS_CLOUD")
-        self.limit = 0.2
+        self.limit = limit
 
     def json_to_doc(self, data: Dict, meta_info: Dict = None) -> Document:
         """

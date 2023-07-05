@@ -32,11 +32,11 @@ def get_chat_openai(model_name: str = 'text-davinci-003' ,max_tokens: int = 256)
     return model
 
 ## MODELS
-def get_huggingface_embeddings():
+def get_huggingface_embeddings(repo_id = "sentence-transformers/all-distilroberta-v1"):
     load_my_env()
     key = os.getenv("HUGGING")
     os.environ['HUGGINGFACEHUB_API_TOKEN'] = key
-    emb = HuggingFaceHubEmbeddings()
+    emb = HuggingFaceHubEmbeddings(repo_id = repo_id)
     print("HuggingFace Embedding is ready")
     return emb
 

@@ -40,8 +40,9 @@ TEST_WANTED_DATA = [{
     "The laptop should have 8 GB RAM",
     "The laptop should function normally"
   ]
-},
-{
+}]
+
+EXTRA = [{
   "post_id": "003",
   "user_id": "A003",
   "date": "10-7-2023",
@@ -173,4 +174,3 @@ TEST_WANTED_DATA = [{
     "The chair should be easy to clean"
   ]
 }]
-
