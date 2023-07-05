@@ -5,7 +5,7 @@ import sys
 sys.path.append('../')
 from botcore.chains.assess_usage import build_assess_usage_tool
 from botcore.chains.pros_cons import build_pros_cons_tool
-
+from botcore.chains.recycling_tip import build_recycling_tip_tool
 
 class AgentBot:
 
@@ -21,15 +21,13 @@ class AgentBot:
         if return_only_output:
             return resp['output'] # str
 
-        steps = resp['intermediate_steps'][0]
+        steps = resp['intermediate_steps']
 
-        chain_result = steps[1]
-        return {"output": resp['output'], "chain_output": chain_result}
-
+        return steps
         
     def load_tools(self, model, memory):
         tools = [build_assess_usage_tool(model,memory),
-                 build_pros_cons_tool(model,memory)]
+                 build_pros_cons_tool(model,memory), build_recycling_tip_tool(model, memory)]
         return tools
 
     

@@ -33,7 +33,7 @@ def build_recycling_tip_chain(model: BaseLLM, memory: BaseChatMemory):
 def build_recycling_tip_tool(model: BaseLLM, memory: BaseChatMemory):
     name = RECYCLING_TIP_TOOL['name']
     desc = RECYCLING_TIP_TOOL['desc']
-    chain = build_pros_cons_chain(model, memory)
+    chain = build_recycling_tip_chain(model, memory)
     func = lambda question: chain.run(question)
     tool = Tool.from_function(func=func, name=name, description=desc)
     return tool
