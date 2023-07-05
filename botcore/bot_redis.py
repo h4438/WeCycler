@@ -17,6 +17,68 @@ def connect_redis():
     db = redis.Redis(host = host, port = port, password=password, decode_responses=True)
     return db
 
+class RedisDB:
+
+    def __init__(self):
+
+        load_my_env()
+        self.embeddings = get_openai_embeddings()
+        self.url = os.getenv("REDIS_CLOUD")
+        self.limit = 0.2
+
+    def json_to_doc(self, data: Dict, meta_info: Dict = None) -> Document:
+        """
+            data = {"title": str, "features": [], "post_id": str, ...}
+        """
+        feats = ", ".join([i for i in data['features']])
+        txt = f"{data['title']}. {feats}"
+        return Document(page_content=txt, metadata=meta_info)
+
+    def add_doc(self, doc: Document, index_name: str):
+        try:
+            redis = Redis(redis_url = self.url, index_name = index_name,\
+                    embedding_function=self.embeddings.embed_query)
+            redis.add_documents([doc])
+            return True
+        except:
+            print("An exception occurred when adding new doc")
+            return False
+
+    ## add
+    def add_new_wanted(self, data: Dict):
+        index = f'wanted_{data["product"]}'
+        doc = self.json_to_doc(data, {"type": index})
+        return self.add_doc(doc, index)
+
+    def add_new_stock(self, data: Dict):
+        index = f"stock_{data['product']}"
+        doc = self.json_to_doc(data, {"type": index})
+        return self.add_doc(doc, index)
+        
+    ## search
+    def find_in_wanted(self, data: Dict):
+        index = f'wanted_{data["product"]}'
+        return self.search_doc(data, index)
+
+    def find_in_stock(self, data: Dict):
+        index = f'stock_{data["product"]}'
+        return self.search_doc(data, index)
+
+    def search_doc(self, data: Dict, index_name: str):
+        self.add_new_stock(data)
+        
+        redis = Redis(redis_url = self.url, index_name = index_name,\
+                    embedding_function=self.embeddings.embed_query)
+        
+        doc = self.json_to_doc(data, {"type": index_name})
+        query = doc.page_content
+        try:
+            results = redis.similarity_search_limit_score(query, score_threshold=self.limit)
+            return results
+        except:
+            print("Error occurred when finding documents")
+            return False
+
 
 class RedisVectorDB:
 
