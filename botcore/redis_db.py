@@ -7,14 +7,22 @@ import json
 from langchain.vectorstores.redis import Redis
 import sys
 sys.path.append(f"../")
-from botcore.setup import get_openai_embeddings, load_my_env
+from botcore.setup import get_huggingface_embeddings, load_my_env
+
+def connect_redis():
+    load_my_env()
+    host = os.getenv("REDIS_HOST")
+    password = os.getenv("REDIS_PASS")
+    port = os.getenv("REDIS_PORT")
+    db = redis.Redis(host = host, port = port, password=password, decode_responses=True)
+    return db
 
 class RedisDB:
 
     def __init__(self):
 
         load_my_env()
-        self.embeddings = get_openai_embeddings()
+        self.embeddings = get_huggingface_embeddings()
         self.url = os.getenv("REDIS_CLOUD")
         self.limit = 0.2
 

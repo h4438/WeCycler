@@ -7,15 +7,16 @@ from botcore.utils.json_parser import parse_nested_json
 from botcore.chains.qa_feature import build_ask_feature_chain
 from botcore.chains.qa_condition import build_ask_condition_chain
 from botcore.chains.extract_product import build_extract_product_chain
+from botcore.redis_db import connect_redis
 
 class FeatureExplorer():
     
-    def __init__(self, model: BaseLLM, redis):
+    def __init__(self, model: BaseLLM):
         
         self.ask_feature = build_ask_feature_chain(model)
         self.ask_condition = build_ask_condition_chain(model)
         self.extract_product = build_extract_product_chain(model)
-        self.redis = redis
+        self.redis = connect_redis()
         print("Features explorer ready")
 
     def generate_qa(self, question: str, n_top: int = 4):
