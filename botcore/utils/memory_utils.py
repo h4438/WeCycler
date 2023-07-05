@@ -33,7 +33,13 @@ class QAMemory():
             self.memory.chat_memory.add_ai_message(q)
             self.memory.chat_memory.add_user_message(a)
         return True
-            
+    
+    def import_qa(self, data: Dict):
+
+        ques = [i.split("?")[0] for i in data['features']]
+        ans = [i.split("?")[1] for i in data['features']]
+        self.load_all(data['title'], ques, ans)
+        return True
 
     def load_all(self, product: str, questions: List[str], answers: List[str]):
         self.load_product_context(product)
