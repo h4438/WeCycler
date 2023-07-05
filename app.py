@@ -60,15 +60,13 @@ def chat(input_user, nums):
     feat, cond = explorer.ask_user(input_user, nums)
     
     
-    # ask_conditions = build_ask_condition_chain(MODEL)
-    # conditions = ask_conditions({"product": input_user, "n_top": 3})
-    # 6 questions 8 questions -> function
     
     try:
         result = feat['questions']
         result.extend(cond['questions'])
     except:
-        pass
+        result = feat['questions']
+        
     return result
 
 
@@ -174,13 +172,11 @@ INITIAL_MESSAGE = [
 def conservationBot(data, inputuser):
     MODEL = trace_ai21()
     TEMPLATE = """ You are Wecycler, an AI-powered recycling chatbot. You specialize in providing insights about the environment, recycling processes, and the value of secondhand products. You excel at answering a variety of questions in these areas based on previous interactions.
-
     Chat history: {chat_history}
-
     Given the question: {question}
-
-    Please, as Wecycler, provide your most informative and helpful response."""
-    
+    Please, as Wecycler, provide your most informative and helpful response. 
+    Be sure to refer to the user's items as 'your product' when providing details or assessments"""
+        
     ques = [i.split("?")[0] for i in data['features']]
     ans = [i.split("?")[1] for i in data['features']]
     qa_mem = QAMemory('question')
@@ -213,17 +209,19 @@ if selected_options == '💬chat Bot':
         st.session_state["history"] = []
     with col1:
         datas = {
-        "title": "Old phone",
+        
+        "title": "I have a phone",
         "features": [
-            "What is the screen size? 2.8 inches",
-            "What is the RAM size? 512 MB",
-            "What is the storage capacity? 4 GB",
-            "What is the battery capacity? 1500 mAh",
+            "What is the screen size? 5.5 inches",
+            "What is the screen resolution? 1920x1080 pixels",
+            "What is the RAM size? 2 GB",
+            "What is the storage capacity? 16 GB",
             "Is there any malfunction or defect? yes",
-            "What is the current physical condition of the product? excellent",
-            "Is the product still under warranty? yes"
+            "What is the current physical condition of the product? poor",
+            "Is there any warranty for this product? no"
         ]
     }
+    
         
         if prompt := st.text_input(""):
             with st.spinner(text="Loading"):
