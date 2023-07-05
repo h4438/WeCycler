@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Dict
 from langchain.memory import ConversationBufferMemory
 
 def load_sample_qa():
