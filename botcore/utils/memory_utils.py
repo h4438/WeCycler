@@ -1,7 +1,24 @@
 from typing import List
 from langchain.memory import ConversationBufferMemory
 
+def load_sample_qa():
 
+    data = {
+  "title": "Old phone",
+  "features": [
+    "What is the screen size? 2.8 inches",
+    "What is the RAM size? 512 MB",
+    "What is the storage capacity? 4 GB",
+    "What is the battery capacity? 1500 mAh",
+    "Is there any malfunction or defect? yes",
+    "What is the current physical condition of the product? excellent",
+    "Is the product still under warranty? yes"
+  ]
+}
+
+    ques = [i.split("?")[0] for i in data['features']]
+    ans = [i.split("?")[1] for i in data['features']]
+    return ques, ans
 
 
 class QAMemory():
