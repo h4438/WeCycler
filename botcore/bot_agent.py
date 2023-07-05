@@ -21,9 +21,7 @@ class AgentBot:
         if return_only_output:
             return resp['output'] # str
 
-        steps = resp['intermediate_steps']
-
-        return steps
+        return resp
         
     def load_tools(self, model, memory):
         tools = [build_assess_usage_tool(model,memory),
