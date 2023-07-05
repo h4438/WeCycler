@@ -6,6 +6,7 @@ from botcore.utils.json_parser import parse_nested_json
 
 from botcore.chains.qa_feature import build_ask_feature_chain
 from botcore.chains.qa_condition import build_ask_condition_chain
+from botcore.chains.extract_product import build_extract_product_chain
 
 class FeatureExplorer():
     
@@ -13,11 +14,15 @@ class FeatureExplorer():
         
         self.ask_feature = build_ask_feature_chain(model)
         self.ask_condition = build_ask_condition_chain(model)
+        self.extract_product = build_extract_product_chain(model)
         self.redis = redis
         print("Features explorer ready")
 
-    def generate_qa(self, product: str, n_top: int = 4):
+    def generate_qa(self, question: str, n_top: int = 4):
         output_key = 'result'
+
+        product = self.extract_product.run(question)
+        product = product.lower()
         feat_qa = self.ask_feature({"product": product, "n_top": n_top})
         cond_qa = self.ask_condition({"product": product, "n_top": n_top})
         # cache
