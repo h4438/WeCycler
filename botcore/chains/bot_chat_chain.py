@@ -7,6 +7,7 @@ from langchain.prompts import PromptTemplate
 
 TEMPLATE = """ You are a secondhand dealer, an environmentalist.
 You can answer many types of question about environemnt, recycling and secondhand product in general very well.
+You are having a conversation with a user.
 Based on your questions and user answers from the chat history.
  {chat_history}
 
