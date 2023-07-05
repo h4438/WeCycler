@@ -36,9 +36,9 @@ class RedisDB:
 
     def add_doc(self, doc: Document, index_name: str):
         try:
-            redis = Redis(redis_url = self.url, index_name = index_name,\
-                    embedding_function=self.embeddings.embed_query)
-            redis.add_documents([doc])
+            
+            Redis.from_documents([doc], self.embeddings, redis_url=self.url, index_name=index_name)
+
             return True
         except:
             print("An exception occurred when adding new doc")
@@ -46,33 +46,32 @@ class RedisDB:
 
     ## add
     def add_new_wanted(self, data: Dict):
-        index = f'wanted_{data["product"]}'
+        index = f'wanted {data["product"]}'
         doc = self.json_to_doc(data, {"type": index})
         return self.add_doc(doc, index)
 
     def add_new_stock(self, data: Dict):
-        index = f"stock_{data['product']}"
+        index = f"stock {data['product']}"
         doc = self.json_to_doc(data, {"type": index})
         return self.add_doc(doc, index)
         
     ## search
-    def find_in_wanted(self, data: Dict):
-        index = f'wanted_{data["product"]}'
+    def search_in_wanted(self, data: Dict):
+        index = f'wanted {data["product"]}'
         return self.search_doc(data, index)
 
-    def find_in_stock(self, data: Dict):
-        index = f'stock_{data["product"]}'
+    def search_in_stock(self, data: Dict):
+        index = f'stock {data["product"]}'
         return self.search_doc(data, index)
 
     def search_doc(self, data: Dict, index_name: str):
-        self.add_new_stock(data)
-        
         redis = Redis(redis_url = self.url, index_name = index_name,\
                     embedding_function=self.embeddings.embed_query)
         
         doc = self.json_to_doc(data, {"type": index_name})
         query = doc.page_content
         try:
+            print("Start searching")
             results = redis.similarity_search_limit_score(query, score_threshold=self.limit)
             return results
         except:
