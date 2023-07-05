@@ -46,22 +46,26 @@ class RedisDB:
 
     ## add
     def add_new_wanted(self, data: Dict):
-        index = f'wanted {data["product"]}'
+        p =  data["product"].replace(" ","_")
+        index = f"wanted:{p}"
         doc = self.json_to_doc(data, {"type": index})
         return self.add_doc(doc, index)
 
     def add_new_stock(self, data: Dict):
-        index = f"stock {data['product']}"
+        p =  data["product"].replace(" ","_")
+        index = f"stock:{p}"
         doc = self.json_to_doc(data, {"type": index})
         return self.add_doc(doc, index)
         
     ## search
     def search_in_wanted(self, data: Dict):
-        index = f'wanted {data["product"]}'
+        p =  data["product"].replace(" ","_")
+        index = f"wanted:{p}"
         return self.search_doc(data, index)
 
     def search_in_stock(self, data: Dict):
-        index = f'stock {data["product"]}'
+        p =  data["product"].replace(" ","_")
+        index = f"stock:{p}"
         return self.search_doc(data, index)
 
     def search_doc(self, data: Dict, index_name: str):
