@@ -1,3 +1,4 @@
+PRO_CON_TOOL = {"desc": "Good for answering questions about a product's pros and cons.", "name":"pro_and_con"}
 PRO_CON_CONST =\
 {"inputs": ["chat_history", "question"],
  "outputs": {"pros": "a js array of the product's pros based on the chat history.",
@@ -15,8 +16,11 @@ import sys
 import os
 sys.path.append(f'{os.path.dirname(__file__)}/../..')
 from botcore.utils.prompt_utils import build_prompt
+from langchain.memory.chat_memory import BaseChatMemory
 
-def build_pros_cons_chain(model: BaseLLM, memory):
+from langchain.tools import Tool
+
+def build_pros_cons_chain(model: BaseLLM, memory: BaseChatMemory):
     """
     Chain is designed to answer questions about pros and cons.
     Input: chain({"question": question})
@@ -27,3 +31,12 @@ def build_pros_cons_chain(model: BaseLLM, memory):
     prompt = build_prompt(inputs, outputs, template)
     chain = LLMChain(llm=model, verbose=True, prompt=prompt, memory=memory)
     return chain
+
+def build_pros_cons_tool(model: BaseLLM, memory: BaseChatMemory):
+    name = PRO_CON_TOOL['name']
+    desc = PRO_CON_TOOL['desc']
+    chain = build_pros_cons_chain(model, memory)
+    func = lambda question: chain.run(question)
+    tool = Tool.from_function(func=func, name=name, description=desc)
+    return tool
+
