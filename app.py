@@ -40,6 +40,7 @@ selected_options = option_menu(None, ["📝Analytics",  "💬chat Bot"],
         "icon": {"color": "#76b31d", "font-size": "25px"}, 
         "nav-link": {"font-size": "15px", "text-align": "left", "margin":"0px", "--hover-color": "#76b31d"},
         "nav-link-selected": {"background-color": "#1fc724"},
+    
     }
 )
 
@@ -57,8 +58,11 @@ def chat(input_user, nums):
     # conditions = ask_conditions({"product": input_user, "n_top": 3})
     # 6 questions 8 questions -> function
     
-    result = feat['questions']
-    result.extend(cond['questions'])
+    try:
+        result = feat['questions']
+        result.extend(cond['questions'])
+    except:
+        pass
     return result
 
 
