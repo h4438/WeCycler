@@ -40,11 +40,7 @@ TEST_WANTED_DATA = [{
     "The laptop should have 8 GB RAM",
     "The laptop should function normally"
   ]
-},{
-    "product": "phone",
-    "title": "I lost my phone and need a replacement"
-    "features": ["The phone should be durable", "The phone should be intact", "The phone must be working correctly"]
-    },
+},
 {
   "post_id": "003",
   "user_id": "A003",
