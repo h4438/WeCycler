@@ -24,7 +24,13 @@ class RedisVectorDB:
         load_my_env()
         self.embeddings = get_openai_embeddings()
         self.url = os.getenv("REDIS_CLOUD")
-        self.redis = {'wanted': None, 'stock': None}
+        
+        self.redis = {}
+        self.redis['wanted'] = Redis(redis_url = self.url, index_name = "wanted",\
+                embedding_function=self.embeddings.embed_query)
+        self.redis['stock'] = Redis(redis_url = self.url, index_name = "stock",\
+                embedding_function=self.embeddings.embed_query)
+        
         self.limit = 0.2
         print("Vector DB is ready")
     
@@ -39,12 +45,20 @@ class RedisVectorDB:
     ## add
     def add_new_wanted(self, data: Dict):
         doc = self.json_to_doc(data, {"type": "wanted"})
-        return self.add_new_doc(doc, 'wanted')
+        return self.add_doc(doc, 'wanted')
 
     def add_new_stock(self, data: Dict):
         doc = self.json_to_doc(data, {"type": "stock"})
-        return self.add_new_doc(doc, 'stock')
+        return self.add_doc(doc, 'stock')
     
+    def add_doc(self, doc: Document, index_name: str):
+        try:
+            self.redis[index_name].add_documents([doc])
+            return True
+        except:
+            print("An exception occurred when adding new doc")
+            return False
+
     def add_new_doc(self, doc: Document, index_name: str):
         try:
             if self.redis[index_name] is None:
