@@ -42,7 +42,7 @@ TEST_WANTED_DATA = [{
   ]
 }]
 
-EXTRA = [{
+EXTRA_WANTED_DATA = [{
   "post_id": "003",
   "user_id": "A003",
   "date": "10-7-2023",
