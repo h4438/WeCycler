@@ -7,7 +7,6 @@ from streamlit_option_menu import option_menu
 import re
 import html
 
-
 sys.path.append(f'{os.path.dirname(__file__)}/../')
 from botcore.chains.qa_feature import build_ask_feature_chain
 from botcore.chains.qa_condition import build_ask_condition_chain
@@ -16,9 +15,7 @@ from botcore.setup import trace_ai21
 
 from src.components.format_message import *
 from botcore.setup import get_ai21_model, enable_tracing
-from botcore.bot_redis import connect_redis
-from botcore.routing.explore_route import FeatureExplorer
-
+from botcore.routing.base_route import FeatureExplorer
 
 # botchat
 from langchain.chains import ConversationChain, LLMChain
@@ -27,8 +24,8 @@ from botcore.bot_agent import AgentBot
 from botcore.utils.memory_utils import QAMemory
 
 # redis
-from botcore.bot_redis import RedisVectorDB
-from botcore.test_data import TEST_WANTED_DATA 
+#from botcore.redis_db import RedisDB
+#from botcore.test_data import TEST_WANTED_DATA 
 
 
 st.set_page_config(
@@ -52,14 +49,10 @@ selected_options = option_menu(None, ["📝Analytics",  "💬chat Bot"],
 
 
 def chat(input_user, nums):
-    MODEL = get_ai21_model(max_tokens = 400)
-    enable_tracing("ask_demo")
-
-    db = connect_redis()
-    explorer = FeatureExplorer(MODEL, db)
-    feat, cond = explorer.ask_user(input_user, nums)
-    
-    
+    MODEL = get_ai21_model(max_tokens = 1000)
+    enable_tracing("vechai")
+    explorer = FeatureExplorer(MODEL)
+    product, feat, cond = explorer.ask_user(input_user, nums)
     
     try:
         result = feat['questions']
@@ -67,7 +60,7 @@ def chat(input_user, nums):
     except:
         result = feat['questions']
         
-    return result
+    return product, result
 
 
 
@@ -119,7 +112,7 @@ if selected_options == '📝Analytics':
             message(st.session_state.user_text,is_user=True, key=str("hello") + "_user",avatar_style="adventurer", # change this for different user icon
                 seed=123,)
 
-            data = chat(str(st.session_state.user_text),  st.session_state.nums_Q)
+            product,data = chat(str(st.session_state.user_text),  st.session_state.nums_Q)
             #data = parse_nested_json(response['result'])
 
         # Routing class 
@@ -147,16 +140,16 @@ if selected_options == '📝Analytics':
                 
                 list_answer['title'] = st.session_state.user_text
                 list_answer['features'] = metadata_feature
-                
+                list_answer['product'] = product 
                 #list_answer['Quantity'] = st.session_state.number_quantity
                 if st.form_submit_button('Confirm Responses'):
                     with st.spinner('I loading...'):
-                        redis_db = RedisVectorDB()
-                        data = TEST_WANTED_DATA
-                        [redis_db.add_new_wanted(a) for a in data]
+                        #redis_db = RedisVectorDB()
+                        #data = TEST_WANTED_DATA
+                        #[redis_db.add_new_wanted(a) for a in data]
                         
                         st.write(list_answer)
-                        b = redis_db.search_wanted(data)
+                        #b = redis_db.search_wanted(data)
                     st.write(b)
                     st.session_state['button'] = False
 

@@ -7,11 +7,11 @@ sys.path.append(f'{os.path.dirname(__file__)}/../')
 from botcore.chains.ask_feature import build_ask_feature_chain
 from botcore.setup import trace_ai21
 
-MODEL = trace_ai21()
-
+MODEL = trace_ai21(model_name="j2-supper")
 
 ask_feature = build_ask_feature_chain(MODEL)
 
 product = "washing machine"
+product = "old books and notebooks"
 features = ask_feature({"product": product, "n_top": 5})
 print(features)

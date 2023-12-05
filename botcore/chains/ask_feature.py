@@ -1,6 +1,3 @@
-
-
-
 ASK_FEATURE_CONST = \
 {"inputs":["product", "n_top"],
  "outputs": {"questions": """a js array of questions."""},
